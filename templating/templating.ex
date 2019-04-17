@@ -1,19 +1,20 @@
 defmodule Templating do
   require EEx
-  def render(name) do
-    {:ok, text} = File.read("template.eex")
-    output = EEx.eval_string(text, name: name)
-    File.write("output.rb", output)
-  end
 
-
-  def gen(name) do
+  def gen_ruby(name) do
+    IO.puts "Generating base Ruby code."
     System.cmd("mkdir", ["ruby"])
     System.cmd("mkdir", ["spec"], cd: "ruby")
     System.cmd("cp", ["src/Gemfile", "ruby"])
-    System.cmd("bundle", ["install"], cd: "ruby")
+    System.cmd("cp", ["src/.rspec", "ruby"])
+    System.cmd("cp", ["src/spec_helper.rb", "ruby/spec"])
+    IO.puts "* Generating base source and spec."
     gen_ruby_main_file(name)
     gen_ruby_spec_file(name)
+
+    IO.puts "* Running bundle"
+    System.cmd("bundle", ["install"], cd: "ruby")
+    IO.puts "::Completed::"
   end
 
   def gen_ruby_main_file(name) do
